@@ -82,7 +82,7 @@ export default function Snake({cols, lines, targets, onTargetTouch}: SnakeParams
     document.addEventListener('keydown', keyPressHandler);
     const interval = setInterval(() => {
       moveSnake();
-    }, 100);
+    }, 400);
     return () => {
       clearInterval(interval);
       document.removeEventListener('keydown', keyPressHandler);
