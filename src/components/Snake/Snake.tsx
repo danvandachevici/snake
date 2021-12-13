@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import TargetInterface from "../../types/target.interface";
 import './Snake.css';
 
 const equals = (a: any, b: any) =>
@@ -10,7 +11,7 @@ let movesQueue: any = [];
 interface SnakeParamsType {
   cols: number;
   lines: number;
-  targets: any;
+  targets: TargetInterface[];
   onTargetTouch: any;
 }
 
@@ -62,16 +63,20 @@ export default function Snake({cols, lines, targets, onTargetTouch}: SnakeParams
       ]
       snakeCopy.push(newPos);
     }
-    setSnake(snakeCopy);
     const snakeHead = snake[snake.length-1];
-    for (let i = 0; i < targets.length; i++) {
-      if (targets[i].col === snakeHead[1] && 
-        targets[i].line === snakeHead[0]
+    targets.forEach((target, idx) => {
+      if (target.col === snakeHead[1] && 
+        target.line === snakeHead[0]
       ) {
-
-        onTargetTouch(targets[i], i);
+        onTargetTouch(idx);
+        const newTail = [
+          snakeCopy[0][0] - currentDirection[0],
+          snakeCopy[0][1] - currentDirection[1]
+        ];
+        snakeCopy.unshift(newTail);
       }
-    }
+    });
+    setSnake(snakeCopy);
   }
   useEffect(() => {
     document.addEventListener('keydown', keyPressHandler);

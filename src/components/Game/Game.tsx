@@ -18,8 +18,7 @@ export default function Game() {
     
   const [targets, setTargets] = useState<TargetInterface[]>([m1]);
 
-  const handleTouch = function(x: TargetInterface, idx: number) {
-    console.log('Touched', x);
+  const handleTouch = function(idx: number) {
     const targetsCopy = [...targets];
     targetsCopy.splice(idx, 1, new MouseType(
       Math.floor(Math.random()*boardLines),
