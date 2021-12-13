@@ -18,9 +18,7 @@ export default function Snake() {
 
   let [currentDirection, setCurrentDirection] = useState(moveRight);
 
-  const keyPressHandler = (ev: any) => {
-    console.log('event handler', ev.code);
-    
+  const keyPressHandler = (ev: any) => {    
     switch (ev.code) {
       case 'ArrowDown': !equals(currentDirection, moveUp) && movesQueue.push(moveDown); break;
       case 'ArrowUp': !equals(currentDirection, moveDown) && movesQueue.push(moveUp); break;
@@ -62,9 +60,6 @@ export default function Snake() {
     setSnake(snakeCopy);
   }
   useEffect(() => {
-    // @ts-ignore
-    window.movesQueue = movesQueue;
-
     document.addEventListener('keydown', keyPressHandler);
     const interval = setInterval(() => {
       moveSnake();
