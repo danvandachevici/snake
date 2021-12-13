@@ -1,28 +1,33 @@
 import { useEffect, useState } from "react";
 import './Snake.css';
 
+const equals = (a: any, b: any) =>
+  a.length === b.length &&
+  a.every((v: any, i: any) => v === b[i]);
+
+let movesQueue: any = [];
+
 export default function Snake() {
 
-  const moveRight = ([l, c]: any) => [l, (c+1) % 55];
-  const moveLeft = ([l, c]: any) => [l, (55 + c-1) % 55];
-  const moveDown = ([l, c]: any) => [(l+1) % 40, c];
-  const moveUp = ([l, c]: any) => [(40 + l-1) % 40, c];
+  const moveRight = [0, 1];
+  const moveLeft = [0, -1];
+  const moveDown = [1, 0];
+  const moveUp = [-1, 0];
 
   const pixelWidth = 10;
 
-  let currentDirection = moveRight;
+  let [currentDirection, setCurrentDirection] = useState(moveRight);
 
-  document.addEventListener('keyup', (event) => {
-    console.log('keydown');
-
-    switch (event.code) {
-      case 'ArrowDown': currentDirection = moveDown; break;
-      case 'ArrowUp': currentDirection = moveUp; break;
-      case 'ArrowRight': currentDirection = moveRight; break;
-      case 'ArrowLeft': currentDirection = moveLeft; break;
+  const keyPressHandler = (ev: any) => {
+    console.log('event handler', ev.code);
+    
+    switch (ev.code) {
+      case 'ArrowDown': !equals(currentDirection, moveUp) && movesQueue.push(moveDown); break;
+      case 'ArrowUp': !equals(currentDirection, moveDown) && movesQueue.push(moveUp); break;
+      case 'ArrowRight': !equals(currentDirection, moveLeft) && movesQueue.push(moveRight); break;
+      case 'ArrowLeft': !equals(currentDirection, moveRight) && movesQueue.push(moveLeft); break;
     }
-  });
-
+  }
   let [snake, setSnake] = useState([
     [0, 0],
     [0, 1],
@@ -30,28 +35,48 @@ export default function Snake() {
     [0, 3],
     [0, 4],
   ]);
-
+  
   const moveSnake = () => {
     const snakeCopy = [...snake];
-    snakeCopy.shift();
-    const snakeHead = snakeCopy[snakeCopy.length - 1];
-    // snakeCopy.push([
-    //   snakeHead[0],
-    //   (snakeHead[1]+1) % 55
-    // ]);
-    snakeCopy.push(currentDirection(snakeHead));
-
+    if (!movesQueue.length) {
+      snakeCopy.shift();
+      const snakeHead = snakeCopy[snakeCopy.length - 1];
+      const newPos = [
+        (40 + snakeHead[0] + currentDirection[0]) % 40, 
+        (55 + snakeHead[1] + currentDirection[1]) % 55
+      ]
+      snakeCopy.push(newPos);
+    } else {
+      const nextMove = movesQueue.shift();
+      if (nextMove) {
+        setCurrentDirection(nextMove);
+      }
+      snakeCopy.shift();
+      const snakeHead = snakeCopy[snakeCopy.length - 1];
+      const newPos = [
+        (40 + snakeHead[0] + currentDirection[0]) % 40, 
+        (55 + snakeHead[1] + currentDirection[1]) % 55
+      ]
+      snakeCopy.push(newPos);
+    }
     setSnake(snakeCopy);
   }
   useEffect(() => {
+    // @ts-ignore
+    window.movesQueue = movesQueue;
+
+    document.addEventListener('keydown', keyPressHandler);
     const interval = setInterval(() => {
       moveSnake();
-    }, 1000);
+    }, 100);
     return () => {
       clearInterval(interval);
+      document.removeEventListener('keydown', keyPressHandler);
     }
-  }, [snake, currentDirection]);
+  }, [snake]);
 
+  
+  
   const snakePos = snake.map((box, i) => {
     return (
       <div className="snake" key={`_${i}`} style={{
