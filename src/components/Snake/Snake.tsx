@@ -7,7 +7,14 @@ const equals = (a: any, b: any) =>
 
 let movesQueue: any = [];
 
-export default function Snake() {
+interface SnakeParamsType {
+  cols: number;
+  lines: number;
+  targets: any;
+  onTargetTouch: any;
+}
+
+export default function Snake({cols, lines, targets, onTargetTouch}: SnakeParamsType) {
 
   const moveRight = [0, 1];
   const moveLeft = [0, -1];
@@ -40,24 +47,31 @@ export default function Snake() {
       snakeCopy.shift();
       const snakeHead = snakeCopy[snakeCopy.length - 1];
       const newPos = [
-        (40 + snakeHead[0] + currentDirection[0]) % 40, 
-        (55 + snakeHead[1] + currentDirection[1]) % 55
+        (lines + snakeHead[0] + currentDirection[0]) % lines, 
+        (cols + snakeHead[1] + currentDirection[1]) % cols
       ]
       snakeCopy.push(newPos);
     } else {
       const nextMove = movesQueue.shift();
-      if (nextMove) {
-        setCurrentDirection(nextMove);
-      }
+      setCurrentDirection(nextMove);
       snakeCopy.shift();
       const snakeHead = snakeCopy[snakeCopy.length - 1];
       const newPos = [
-        (40 + snakeHead[0] + currentDirection[0]) % 40, 
-        (55 + snakeHead[1] + currentDirection[1]) % 55
+        (lines + snakeHead[0] + currentDirection[0]) % lines, 
+        (cols + snakeHead[1] + currentDirection[1]) % cols
       ]
       snakeCopy.push(newPos);
     }
     setSnake(snakeCopy);
+    const snakeHead = snake[snake.length-1];
+    for (let i = 0; i < targets.length; i++) {
+      if (targets[i].col === snakeHead[1] && 
+        targets[i].line === snakeHead[0]
+      ) {
+
+        onTargetTouch(targets[i], i);
+      }
+    }
   }
   useEffect(() => {
     document.addEventListener('keydown', keyPressHandler);

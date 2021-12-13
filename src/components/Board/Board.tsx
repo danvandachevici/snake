@@ -2,26 +2,25 @@ import Pixel from '../Pixel/Pixel';
 import './Board.css';
 
 interface BoardParamsType {
-  widthInPixels?: number;
-  pixelHeight?: number;
+  cols: number;
+  lines: number;
 }
 
-function draw(widthInPixels: number, pixelHeight: number) {
+function draw(cols: number, lines: number) {
   let pixels = [];
-  for (let i= 0 ; i < widthInPixels; i++) {
-    for (let j = 0; j < pixelHeight; j++) {
+  for (let i= 0 ; i < cols; i++) {
+    for (let j = 0; j < lines; j++) {
       pixels.push(<Pixel key={`${i}_${j}`}/>);
     }
   }
-  
+
   return (
-    <div className="board">
+    <div className="board" style={{width: 10*cols, height: 10*lines}}>
       {pixels}
     </div>
   );
 }
 
-export default function Board({widthInPixels = 55, pixelHeight = 40}: BoardParamsType) {
-
-  return draw(widthInPixels, pixelHeight);
+export default function Board({cols, lines}: BoardParamsType) {
+  return draw(cols, lines);
 }

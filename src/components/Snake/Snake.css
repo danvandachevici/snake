@@ -8,3 +8,8 @@
   padding: 0;
   background: coral;
 }
+
+.snake:last-of-type {
+  background:cornflowerblue;
+  border: #4d1226 2px solid;
+}

@@ -1,0 +1,10 @@
+.mouse {
+  width: 10px;
+  height: 10px;
+  box-sizing: border-box;
+  border: #cacaca 1px solid;
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  background: rgb(61, 57, 57);
+}
