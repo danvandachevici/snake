@@ -2,7 +2,7 @@
 
 This is a simple game of snake. It should remind you of your childhood, and add a twist to that memory.
 
-![hero snake image](https://github.com/[username]/[reponame]/blob/[branch]/image.jpg?raw=true)
+![hero snake image](https://github.com/danvandachevici/snake/blob/master/img/snake-hero-image.png?raw=true)
 
 
 # Install
