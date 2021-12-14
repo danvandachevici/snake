@@ -2,11 +2,15 @@ import { useEffect, useState } from "react";
 import TargetInterface from "../../types/target.interface";
 import './Snake.css';
 
-const equals = (a: any, b: any) =>
-  a.length === b.length &&
-  a.every((v: any, i: any) => v === b[i]);
+type Direction = {
+  dx: number
+  dy: number
+}
 
-let movesQueue: any = [];
+const equals = (a?: Direction, b?: Direction) =>
+  a && b && a.dx === b.dx && a.dy === b.dy
+
+let movesQueue: Direction[] = [];
 
 interface SnakeParamsType {
   cols: number;
@@ -15,23 +19,23 @@ interface SnakeParamsType {
   onTargetTouch: any;
 }
 
-export default function Snake({cols, lines, targets, onTargetTouch}: SnakeParamsType) {
+export default function Snake({ cols, lines, targets, onTargetTouch }: SnakeParamsType) {
 
-  const moveRight = [0, 1];
-  const moveLeft = [0, -1];
-  const moveDown = [1, 0];
-  const moveUp = [-1, 0];
+  const moveRight = { dy: 0, dx: 1 };
+  const moveLeft = { dy: 0, dx: -1 };
+  const moveDown = { dy: 1, dx: 0 };
+  const moveUp = { dy: -1, dx: 0 };
 
   const pixelWidth = 10;
 
   let [currentDirection, setCurrentDirection] = useState(moveRight);
 
-  const keyPressHandler = (ev: any) => {    
+  const keyPressHandler = (ev: any) => {
     switch (ev.code) {
-      case 'ArrowDown': !equals(currentDirection, moveUp) && movesQueue.push(moveDown); break;
-      case 'ArrowUp': !equals(currentDirection, moveDown) && movesQueue.push(moveUp); break;
-      case 'ArrowRight': !equals(currentDirection, moveLeft) && movesQueue.push(moveRight); break;
-      case 'ArrowLeft': !equals(currentDirection, moveRight) && movesQueue.push(moveLeft); break;
+      case 'ArrowDown': !equals(movesQueue[0], moveDown) && !equals(currentDirection, moveUp) && movesQueue.push(moveDown); break;
+      case 'ArrowUp': !equals(movesQueue[0], moveUp) && !equals(currentDirection, moveDown) && movesQueue.push(moveUp); break;
+      case 'ArrowRight': !equals(movesQueue[0], moveRight) && !equals(currentDirection, moveLeft) && movesQueue.push(moveRight); break;
+      case 'ArrowLeft': !equals(movesQueue[0], moveLeft) && !equals(currentDirection, moveRight) && movesQueue.push(moveLeft); break;
     }
   }
   let [snake, setSnake] = useState([
@@ -41,37 +45,37 @@ export default function Snake({cols, lines, targets, onTargetTouch}: SnakeParams
     [0, 3],
     [0, 4],
   ]);
-  
+
   const moveSnake = () => {
     const snakeCopy = [...snake];
     if (!movesQueue.length) {
       snakeCopy.shift();
       const snakeHead = snakeCopy[snakeCopy.length - 1];
       const newPos = [
-        (lines + snakeHead[0] + currentDirection[0]) % lines, 
-        (cols + snakeHead[1] + currentDirection[1]) % cols
+        (lines + snakeHead[0] + currentDirection.dy) % lines,
+        (cols + snakeHead[1] + currentDirection.dx) % cols
       ]
       snakeCopy.push(newPos);
     } else {
       const nextMove = movesQueue.shift();
-      setCurrentDirection(nextMove);
+      setCurrentDirection(nextMove as Direction);
       snakeCopy.shift();
       const snakeHead = snakeCopy[snakeCopy.length - 1];
       const newPos = [
-        (lines + snakeHead[0] + currentDirection[0]) % lines, 
-        (cols + snakeHead[1] + currentDirection[1]) % cols
+        (lines + snakeHead[0] + currentDirection.dy) % lines,
+        (cols + snakeHead[1] + currentDirection.dx) % cols
       ]
       snakeCopy.push(newPos);
     }
-    const snakeHead = snake[snake.length-1];
+    const snakeHead = snake[snake.length - 1];
     targets.forEach((target, idx) => {
-      if (target.col === snakeHead[1] && 
+      if (target.col === snakeHead[1] &&
         target.line === snakeHead[0]
       ) {
         onTargetTouch(idx);
         const newTail = [
-          snakeCopy[0][0] - currentDirection[0],
-          snakeCopy[0][1] - currentDirection[1]
+          snakeCopy[0][0] - currentDirection.dy,
+          snakeCopy[0][1] - currentDirection.dx
         ];
         snakeCopy.unshift(newTail);
       }
@@ -89,8 +93,6 @@ export default function Snake({cols, lines, targets, onTargetTouch}: SnakeParams
     }
   }, [snake]);
 
-  
-  
   const snakePos = snake.map((box, i) => {
     return (
       <div className="snake" key={`_${i}`} style={{
@@ -105,5 +107,5 @@ export default function Snake({cols, lines, targets, onTargetTouch}: SnakeParams
     <div>
       {snakePos};
     </div>
-  )   
+  )
 }
