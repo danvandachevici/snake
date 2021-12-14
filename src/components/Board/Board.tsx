@@ -15,7 +15,7 @@ function draw(cols: number, lines: number) {
   }
 
   return (
-    <div className="board" style={{width: 10*cols, height: 10*lines}}>
+    <div id="board" className="board" style={{width: 10*cols, height: 10*lines}}>
       {pixels}
     </div>
   );

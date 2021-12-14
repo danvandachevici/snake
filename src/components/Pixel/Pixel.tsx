@@ -6,6 +6,6 @@ interface PixelParamsType {
 
 export default function Pixel({snake}: PixelParamsType) {
   return (
-    <div className={`pixel ${snake && 'snake'}`}></div>
+    <div className={`pixel${snake ? ' snake' : ''}`}></div>
   )
 }

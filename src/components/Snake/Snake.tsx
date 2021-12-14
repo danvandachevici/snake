@@ -2,9 +2,13 @@ import { useEffect, useState } from "react";
 import TargetInterface from "../../types/target.interface";
 import './Snake.css';
 
-type Direction = {
+class Direction {
   dx: number
   dy: number
+  constructor(x: number, y: number) {
+    this.dx = x;
+    this.dy = y;
+  }
 }
 
 const equals = (a?: Direction, b?: Direction) =>
@@ -17,10 +21,12 @@ interface SnakeParamsType {
   lines: number;
   targets: TargetInterface[];
   onTargetTouch: any;
+  intervalMs: number;
 }
 
-export default function Snake({ cols, lines, targets, onTargetTouch }: SnakeParamsType) {
+export default function Snake({ cols, lines, intervalMs, targets, onTargetTouch }: SnakeParamsType) {
 
+  // functions to move by
   const moveRight = { dy: 0, dx: 1 };
   const moveLeft = { dy: 0, dx: -1 };
   const moveDown = { dy: 1, dx: 0 };
@@ -32,12 +38,16 @@ export default function Snake({ cols, lines, targets, onTargetTouch }: SnakePara
 
   const keyPressHandler = (ev: any) => {
     switch (ev.code) {
+      // when ArrowUp is pressed, I can only go up if I was not already going down
+      // also - I cannot go up, if I'm already going up. No point in adding that 
+      // to the queue
       case 'ArrowDown': !equals(movesQueue[0], moveDown) && !equals(currentDirection, moveUp) && movesQueue.push(moveDown); break;
       case 'ArrowUp': !equals(movesQueue[0], moveUp) && !equals(currentDirection, moveDown) && movesQueue.push(moveUp); break;
       case 'ArrowRight': !equals(movesQueue[0], moveRight) && !equals(currentDirection, moveLeft) && movesQueue.push(moveRight); break;
       case 'ArrowLeft': !equals(movesQueue[0], moveLeft) && !equals(currentDirection, moveRight) && movesQueue.push(moveLeft); break;
     }
   }
+  // snake starts at the first line, and has length 5
   let [snake, setSnake] = useState([
     [0, 0],
     [0, 1],
@@ -46,28 +56,19 @@ export default function Snake({ cols, lines, targets, onTargetTouch }: SnakePara
     [0, 4],
   ]);
 
-  const moveSnake = () => {
-    const snakeCopy = [...snake];
-    if (!movesQueue.length) {
-      snakeCopy.shift();
-      const snakeHead = snakeCopy[snakeCopy.length - 1];
-      const newPos = [
-        (lines + snakeHead[0] + currentDirection.dy) % lines,
-        (cols + snakeHead[1] + currentDirection.dx) % cols
-      ]
-      snakeCopy.push(newPos);
-    } else {
-      const nextMove = movesQueue.shift();
-      setCurrentDirection(nextMove as Direction);
-      snakeCopy.shift();
-      const snakeHead = snakeCopy[snakeCopy.length - 1];
-      const newPos = [
-        (lines + snakeHead[0] + currentDirection.dy) % lines,
-        (cols + snakeHead[1] + currentDirection.dx) % cols
-      ]
-      snakeCopy.push(newPos);
-    }
-    const snakeHead = snake[snake.length - 1];
+  const move1Step = (snakeCopy: any, direction: Direction) => {
+    snakeCopy.shift();
+    const snakeHead = snakeCopy[snakeCopy.length - 1];
+    const newPos = [
+      (lines + snakeHead[0] + currentDirection.dy) % lines,
+      (cols + snakeHead[1] + currentDirection.dx) % cols
+    ]
+    snakeCopy.push(newPos);
+    
+  }
+
+  const runTargetEffectOnSnake = (snakeCopy: any, targets: TargetInterface[]) => {
+    const snakeHead = snakeCopy[snakeCopy.length - 1];
     targets.forEach((target, idx) => {
       if (target.col === snakeHead[1] &&
         target.line === snakeHead[0]
@@ -80,13 +81,33 @@ export default function Snake({ cols, lines, targets, onTargetTouch }: SnakePara
         snakeCopy.unshift(newTail);
       }
     });
+  }
+  
+  const moveSnake = () => {
+    const snakeCopy = [...snake];
+    /**
+     * Move the snake
+     */
+    if (movesQueue.length) {
+      // if there are moves in the queue, alter the current direction 
+      // and go that way
+      const nextMove = movesQueue.shift();
+      setCurrentDirection(nextMove as Direction);
+    }
+    move1Step(snakeCopy, currentDirection);
+    /**
+     * End move the snake
+     */
+
+    runTargetEffectOnSnake(snakeCopy, targets);
+
     setSnake(snakeCopy);
   }
   useEffect(() => {
     document.addEventListener('keydown', keyPressHandler);
     const interval = setInterval(() => {
       moveSnake();
-    }, 400);
+    }, intervalMs);
     return () => {
       clearInterval(interval);
       document.removeEventListener('keydown', keyPressHandler);
