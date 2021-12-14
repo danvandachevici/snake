@@ -1,0 +1,49 @@
+.controls {
+  width: 100px;
+  position: absolute;
+  background: #209cbb;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+h4 {
+  margin: 10px 0 20px 0;
+  padding: 0;
+}
+
+input {
+  width: 40%;
+  height: 15px;
+  border-radius: 8px;
+  margin: 0;
+  font-size: 8px;
+  text-align: center;
+}
+/* hide input of type number arrows */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button {
+  display: none;
+}
+label {
+  width: 50%;
+  margin: 0;
+}
+
+button {
+  margin: 0 auto;
+  width: 80px;
+  height: 15px;
+  border-radius: 6px;
+  font-size: 8px;
+}
+.inputGroup {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  padding: 2px;
+}
+.inputGroup label {
+  margin: auto;
+  font-size: 7px;
+}
