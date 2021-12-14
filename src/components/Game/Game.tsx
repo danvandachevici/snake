@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import MouseType from "../../types/mouse.type";
 import TargetInterface from "../../types/target.interface";
 import Board from "../Board/Board";
