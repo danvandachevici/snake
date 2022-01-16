@@ -22,9 +22,10 @@ interface SnakeParamsType {
   targets: TargetInterface[];
   onTargetTouch: any;
   intervalMs: number;
+  pause: boolean;
 }
 
-export default function Snake({ cols, lines, intervalMs, targets, onTargetTouch }: SnakeParamsType) {
+export default function Snake({ cols, lines, intervalMs, targets, onTargetTouch, pause }: SnakeParamsType) {
 
   // functions to move by
   const moveRight = { dy: 0, dx: 1 };
@@ -105,14 +106,19 @@ export default function Snake({ cols, lines, intervalMs, targets, onTargetTouch 
   }
   useEffect(() => {
     document.addEventListener('keydown', keyPressHandler);
-    const interval = setInterval(() => {
-      moveSnake();
-    }, intervalMs);
+    let timeoutHandle: any;
+    if (pause) {
+      // do nothing
+    } else {
+      timeoutHandle = setTimeout(() => {
+        moveSnake();
+      }, intervalMs);
+    }
     return () => {
-      clearInterval(interval);
+      clearTimeout(timeoutHandle);
       document.removeEventListener('keydown', keyPressHandler);
     }
-  }, [snake]);
+  }, [snake, pause]);
 
   const snakePos = snake.map((box, i) => {
     return (

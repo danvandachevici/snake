@@ -12,6 +12,12 @@ export default function Controls({values, setValues, onGameReset}: ControlsProps
 
   const [enabled, setEnabled] = useState(false);
 
+  const resetPause = () => {
+    const valuesCopy = {...values};
+    valuesCopy.pause = !valuesCopy.pause;
+    setValues(valuesCopy);
+  }
+
   const valueChange = (e: any) => {
     console.log('', e.target.id);
     const valuesCopy = {...values};
@@ -39,8 +45,11 @@ export default function Controls({values, setValues, onGameReset}: ControlsProps
         <input onBlur={() => {setEnabled(false)}} disabled={!enabled} id='intervalMs' type="number" value={values.intervalMs} onChange={valueChange}/>
       </div>
 
+      <button onClick={resetPause}>{values.pause? "Resume" : "Pause"}</button>
+
+
       <button onClick={() => {setEnabled(!enabled)}}>
-        {enabled? "Disable":"Enable"} Config
+        {enabled? "Save":"Enable"} Config
       </button>
     </div>
   )

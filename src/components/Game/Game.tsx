@@ -11,17 +11,19 @@ export default function Game() {
   const [gameConfig, setGameConfig] = useState({
     intervalMs: 200,
     boardLines: 20,
-    boardCols: 35
+    boardCols: 35,
+    pause: false
   });
-  const m1 = new MouseType(
+  const mouse1 = new MouseType(
     Math.floor(Math.random()*gameConfig.boardLines),
     Math.floor(Math.random()*gameConfig.boardCols)
   );
     
-  const [targets, setTargets] = useState<TargetInterface[]>([m1]);
+  const [targets, setTargets] = useState<TargetInterface[]>([mouse1]);
 
   const spawner = () => {
-    const shouldRun = Math.random() > .5;
+    let shouldRun = Math.random() > .5;
+    shouldRun = shouldRun && targets.length < 5;
     if (!shouldRun) return;
 
     targets.push(new MouseType (
@@ -36,13 +38,16 @@ export default function Game() {
     setTargets(targetsCopy);
   }
 
+  /**
+   * Todo: make sure we generate random targets here, not just mice
+   */
   const targetElements = targets.map(
     t => <Mouse key={`${t.line}-${t.col}`} position={{line: t.line, col: t.col}}/>
   );
 
   useEffect(() => {
     setInterval(spawner, 2000);
-  }, [targets])
+  }, [])
 
   const resetGame = () => {
     console.log('Damn it!');
@@ -57,6 +62,7 @@ export default function Game() {
         targets={targets}
         intervalMs={gameConfig.intervalMs}
         onTargetTouch={handleTouch}
+        pause={gameConfig.pause}
       />
       {targetElements}
       <Controls values={gameConfig} setValues={setGameConfig} onGameReset={() => {resetGame()}} />
